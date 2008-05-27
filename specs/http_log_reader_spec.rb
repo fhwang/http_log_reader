@@ -19,4 +19,13 @@ describe HttpLogReader do
       break
     end
   end
+  
+  it 'should parse referers' do
+    requests = HttpLogReader.read( './specs/data/access.log.1' )
+    request = requests.detect { |r|
+      r.ip_address == '220.245.178.135' &&
+        r.request_line.resource == '/css/main.css'
+    }
+    request.referer.should == 'http://fhwang.net/blog/40.html'
+  end
 end

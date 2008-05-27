@@ -1,11 +1,15 @@
 module HttpLogReader
   def self.foreach( file_path )
+    requests = read file_path
+    requests.each do |r| yield( r ); end
+  end
+  
+  def self.read( file_path )
     lines = File.readlines file_path
-    requests = lines.
+    lines.
         map { |line| line.chomp! }.
         select { |line| line.size > 0 }.
         map { |line| Request.new( line ) }
-    requests.each do |r| yield( r ); end
   end
   
   class Request
@@ -16,13 +20,15 @@ module HttpLogReader
                 :referer, :user_agent
     
     def initialize( line )
-      line =~ %r|^(\S+) (\S+) (\S+) \[([^\]]+)\] "([^"]+)" (\S+) (\S+) (\S+) "([^"]+)"|
+      line =~ %r|^(\S+) (\S+) (\S+) \[([^\]]+)\] "([^"]+)" (\S+) (\S+) "(\S+)" "([^"]+)"|
       @ip_address = $1
       @remote_user_name = $2 unless $2 == '-'
       @http_auth_userid = $3 unless $3 == '-'
       time_finished_raw = $4
       request_line_raw = $5
       @status_code = $6.to_i
+      @bytes_returned = $7.to_i unless $7 == '-'
+      @referer = $8 unless $8 == '-'
       @user_agent = $9
       @time_finished = parse_time_finished time_finished_raw
       @request_line = RequestLine.new request_line_raw
