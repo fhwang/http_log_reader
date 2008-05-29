@@ -1,8 +1,12 @@
 require File.dirname(__FILE__) + '/../lib/http_log_reader'
 
 describe HttpLogReader do
+  before( :all ) do
+    @access_log_1 = './specs/data/access.log.1'
+  end
+  
   it 'should read in a stream-based fashion' do
-    HttpLogReader.foreach( './specs/data/access.log.1' ) do |request|
+    HttpLogReader.foreach( @access_log_1 ) do |request|
       request.ip_address.should == '204.9.177.18'
       request.remote_user_name.should be_nil
       request.http_auth_userid.should be_nil
@@ -20,8 +24,15 @@ describe HttpLogReader do
     end
   end
   
+  it 'should start from a timepoint' do
+    start_time = Time.utc( 2007, 7, 21, 8, 12, 18 )
+    HttpLogReader.foreach( @access_log_1, :start_time => start_time ) do |req|
+      req.request_line.resource.should_not == '/rss/latest.xml'
+    end
+  end
+  
   it 'should parse referers' do
-    requests = HttpLogReader.read( './specs/data/access.log.1' )
+    requests = HttpLogReader.read @access_log_1
     request = requests.detect { |r|
       r.ip_address == '220.245.178.135' &&
         r.request_line.resource == '/css/main.css'

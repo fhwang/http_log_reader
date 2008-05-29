@@ -1,15 +1,21 @@
 module HttpLogReader
-  def self.foreach( file_path )
-    requests = read file_path
+  def self.foreach( file_path, opts = {} )
+    requests = read file_path, opts
     requests.each do |r| yield( r ); end
   end
   
-  def self.read( file_path )
+  def self.read( file_path, opts = {} )
     lines = File.readlines file_path
-    lines.
+    requests = lines.
         map { |line| line.chomp! }.
         select { |line| line.size > 0 }.
         map { |line| Request.new( line ) }
+    if opts[:start_time]
+      requests = requests.select { |req|
+        req.time_finished >= opts[:start_time]
+      }
+    end
+    requests
   end
   
   class Request
