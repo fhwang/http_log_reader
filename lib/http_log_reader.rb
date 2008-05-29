@@ -44,9 +44,9 @@ module HttpLogReader
         $3.to_i, $2, $1.to_i, $4.to_i, $5.to_i, $6.to_i
       )
       if offset_direction == '+'
-        time_finished = time_finished + offset_seconds
-      else
         time_finished = time_finished - offset_seconds
+      else
+        time_finished = time_finished + offset_seconds
       end
       time_finished
     end

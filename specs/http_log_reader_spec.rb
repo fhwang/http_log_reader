@@ -6,7 +6,7 @@ describe HttpLogReader do
       request.ip_address.should == '204.9.177.18'
       request.remote_user_name.should be_nil
       request.http_auth_userid.should be_nil
-      request.time_finished.should == Time.utc( 2007, 7, 20, 17, 43, 45 )
+      request.time_finished.should == Time.utc( 2007, 7, 21, 7, 43, 45 )
       request.time_finished.gmt_offset.should == 0
       request.request_line.to_s.should == 'GET /rss/latest.xml HTTP/1.1'
       request.request_line.method.should == 'GET'
